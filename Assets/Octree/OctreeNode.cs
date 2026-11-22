@@ -37,20 +37,43 @@ public class OctreeNode
         childBounds[5] = new Bounds(nodeBounds.center + new Vector3(quarter, quarter, quarter), childSize);
         childBounds[6] = new Bounds(nodeBounds.center + new Vector3(-quarter, -quarter, quarter), childSize);
         childBounds[7] = new Bounds(nodeBounds.center + new Vector3(quarter, -quarter, quarter), childSize);
-
-        Divide();
     }
 
-    public void Divide()
+    public void AddObject(GameObject go)
     {
+        DivideAndAdd(go);
+    }
+
+    public void DivideAndAdd(GameObject go)
+    {
+        OctreeObject octObj = new OctreeObject(go);
         if (nodeBounds.size.x <= minSize)
         {
+            containedObjects.Add(octObj);
             return;
         }
-        children = new OctreeNode[8];
+        if (children == null)
+        {
+            children = new OctreeNode[8];
+        }
+
+        bool dividing = false;
         for(int i = 0; i < 8; i++)
         {
-            children[i] = new OctreeNode(childBounds[i], minSize);
+            if (children[i] == null)
+            {
+                children[i] = new OctreeNode(childBounds[i], minSize);
+            }
+            
+            if (childBounds[i].Contains(octObj.bounds.min) && childBounds[i].Contains(octObj.bounds.max))
+            {
+                dividing = true;
+                children[i].DivideAndAdd(go);
+            }
+        }
+        if (!dividing)
+        {
+            containedObjects.Add(octObj);
         }
     }
 
@@ -62,7 +85,10 @@ public class OctreeNode
         {
             for(int i = 0; i < 8; i++)
             {
-                children[i].Draw();
+                if (children[i] != null)
+                {
+                    children[i].Draw();
+                }
             }
         }
     }

@@ -17,5 +17,14 @@ public class Octree
         bounds.SetMinMax(bounds.center - sizeVector, bounds.center + sizeVector);
 
         rootNode = new OctreeNode(bounds, minNodeSize);
+        AddObjects(worldObjects);
+    }
+
+    public void AddObjects(GameObject[] worldObjects)
+    {
+        foreach (GameObject go in worldObjects)
+        {
+            rootNode.AddObject(go);
+        }
     }
 }
