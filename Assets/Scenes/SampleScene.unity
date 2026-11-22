@@ -1156,6 +1156,7 @@ MonoBehaviour:
   - {fileID: 857304646}
   - {fileID: 682947351}
   - {fileID: 203758365}
+  nodeMinSize: 1
 --- !u!1 &1839346385
 GameObject:
   m_ObjectHideFlags: 0
