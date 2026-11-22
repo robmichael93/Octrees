@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public struct OctreeObject
@@ -64,7 +65,7 @@ public class OctreeNode
             {
                 children[i] = new OctreeNode(childBounds[i], minSize);
             }
-            
+
             if (childBounds[i].Contains(octObj.bounds.min) && childBounds[i].Contains(octObj.bounds.max))
             {
                 dividing = true;
@@ -74,6 +75,7 @@ public class OctreeNode
         if (!dividing)
         {
             containedObjects.Add(octObj);
+            children = null;
         }
     }
 
@@ -81,6 +83,11 @@ public class OctreeNode
     {
         Gizmos.color = new Color(0, 1, 0);
         Gizmos.DrawWireCube(nodeBounds.center, nodeBounds.size);
+        Gizmos.color = new Color(1, 0, 0);
+        foreach (OctreeObject obj in containedObjects)
+        {
+            Gizmos.DrawWireCube(obj.bounds.center, obj.bounds.size);
+        }
         if (children != null)
         {
             for(int i = 0; i < 8; i++)
@@ -90,6 +97,11 @@ public class OctreeNode
                     children[i].Draw();
                 }
             }
+        }
+        else if (containedObjects.Count == 0)
+        {
+            Gizmos.color = new Color (0, 0, 1, 0.25f);
+            Gizmos.DrawCube(nodeBounds.center, nodeBounds.size);
         }
     }
 }
