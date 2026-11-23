@@ -22,10 +22,11 @@ public class Octree
         Vector3 sizeVector = new Vector3(maxSize, maxSize, maxSize) * 0.5f;
         bounds.SetMinMax(bounds.center - sizeVector, bounds.center + sizeVector);
 
-        rootNode = new OctreeNode(bounds, minNodeSize);
+        rootNode = new OctreeNode(bounds, minNodeSize, null);
         AddObjects(worldObjects);
         GetEmptyLeaves(rootNode);
         ProcessExtraConnections();
+        Debug.Log("Number of edges: " + navigationGraph.edges.Count);
     }
 
     public void AddObjects(GameObject[] worldObjects)
@@ -68,18 +69,22 @@ public class Octree
 
     void ProcessExtraConnections()
     {
+        Dictionary<int, int> subGraphConnections = new Dictionary<int, int>();
         foreach (OctreeNode i in emptyLeaves)
         {
             foreach (OctreeNode j in emptyLeaves)
             {
-                if (i.id != j.id)
+                if (i.id != j.id && i.getParent().id != j.getParent().id)
                 {
                     RaycastHit hitInfo;
                     Vector3 direction = j.getNodeBounds().center - i.getNodeBounds().center;
                     float accuracy = 1.0f;
                     if (!Physics.SphereCast(i.getNodeBounds().center, accuracy, direction, out hitInfo))
                     {
-                        navigationGraph.AddEdge(i, j);
+                        if (subGraphConnections.TryAdd(i.getParent().id, j.getParent().id))
+                        {
+                            navigationGraph.AddEdge(i, j);
+                        }
                     }
                 }
             }
