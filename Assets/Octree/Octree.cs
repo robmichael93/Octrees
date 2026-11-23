@@ -25,6 +25,7 @@ public class Octree
         rootNode = new OctreeNode(bounds, minNodeSize);
         AddObjects(worldObjects);
         GetEmptyLeaves(rootNode);
+        ProcessExtraConnections();
     }
 
     public void AddObjects(GameObject[] worldObjects)
@@ -54,6 +55,33 @@ public class Octree
             for (int i = 0; i < 8; i++)
             {
                 GetEmptyLeaves(node.children[i]);
+                for (int s = 0; s < 8; s++)
+                {
+                    if (s != i)
+                    {
+                        navigationGraph.AddEdge(node.children[i], node.children[s]);
+                    }
+                }
+            }
+        }
+    }
+
+    void ProcessExtraConnections()
+    {
+        foreach (OctreeNode i in emptyLeaves)
+        {
+            foreach (OctreeNode j in emptyLeaves)
+            {
+                if (i.id != j.id)
+                {
+                    RaycastHit hitInfo;
+                    Vector3 direction = j.getNodeBounds().center - i.getNodeBounds().center;
+                    float accuracy = 1.0f;
+                    if (!Physics.SphereCast(i.getNodeBounds().center, accuracy, direction, out hitInfo))
+                    {
+                        navigationGraph.AddEdge(i, j);
+                    }
+                }
             }
         }
     }
