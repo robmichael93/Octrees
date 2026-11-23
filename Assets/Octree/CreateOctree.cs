@@ -5,10 +5,13 @@ public class CreateOctree : MonoBehaviour
     public GameObject[] worldObjects;
     public int nodeMinSize = 5;
     Octree ot;
+    Graph waypoints;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        ot = new Octree(worldObjects, nodeMinSize);
+        waypoints = new Graph();
+        ot = new Octree(worldObjects, nodeMinSize, waypoints);
     }
 
     // Update is called once per frame
@@ -22,6 +25,7 @@ public class CreateOctree : MonoBehaviour
         if (Application.isPlaying)
         {
             ot.rootNode.Draw();
+            ot.navigationGraph.Draw();
         }
     }
 }

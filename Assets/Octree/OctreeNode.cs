@@ -87,6 +87,11 @@ public class OctreeNode
         return nodeBounds;
     }
 
+    public List<OctreeObject> getContainedObjects()
+    {
+        return containedObjects;
+    }
+
     public void Draw()
     {
         Gizmos.color = new Color(0, 1, 0);

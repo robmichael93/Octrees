@@ -1,12 +1,18 @@
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Octree
 {
     public OctreeNode rootNode;
+    public List<OctreeNode> emptyLeaves = new List<OctreeNode>();
+    public Graph navigationGraph;
    
-    public Octree(GameObject[] worldObjects, float minNodeSize)
+    public Octree(GameObject[] worldObjects, float minNodeSize, Graph navGraph)
     {
         Bounds bounds = new Bounds();
+        navigationGraph = navGraph;
+
         foreach(GameObject go in worldObjects)
         {
             bounds.Encapsulate(go.GetComponent<Collider>().bounds);
@@ -18,6 +24,7 @@ public class Octree
 
         rootNode = new OctreeNode(bounds, minNodeSize);
         AddObjects(worldObjects);
+        GetEmptyLeaves(rootNode);
     }
 
     public void AddObjects(GameObject[] worldObjects)
@@ -25,6 +32,29 @@ public class Octree
         foreach (GameObject go in worldObjects)
         {
             rootNode.AddObject(go);
+        }
+    }
+
+    public void GetEmptyLeaves(OctreeNode node)
+    {
+        if (node == null)
+        {
+            return;
+        }
+        if (node.children == null)
+        {
+            if (node.getContainedObjects().Count == 0)
+            {
+                emptyLeaves.Add(node);
+                navigationGraph.AddNode(node);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                GetEmptyLeaves(node.children[i]);
+            }
         }
     }
 }
