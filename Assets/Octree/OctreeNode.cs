@@ -15,6 +15,7 @@ public struct OctreeObject
 }
 public class OctreeNode
 {
+    public int id;
     Bounds nodeBounds;
     Bounds[] childBounds;
     public OctreeNode[] children = null;
@@ -25,6 +26,7 @@ public class OctreeNode
     {
         nodeBounds = b;
         minSize = minNodeSize;
+        id = Utils.id_number++;
 
         float quarter = nodeBounds.size.x / 4.0f;
         float childLength = nodeBounds.size.x / 2;
@@ -78,6 +80,11 @@ public class OctreeNode
             containedObjects.Add(octObj);
             children = null;
         }
+    }
+
+    public Bounds getNodeBounds()
+    {
+        return nodeBounds;
     }
 
     public void Draw()
