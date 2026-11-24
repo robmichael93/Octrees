@@ -96,59 +96,64 @@ public class Graph
             int i = lowestF(open);
             Node current = open[i];
 
-            open.Remove(current);
-            closed.Add(current);
-            List<Edge> currentEdges = current.edgeList;
-            for (int j = 0; j < currentEdges.Count; j++)
+            // Check if the current node is the goal location & if so, create the path, then return true
+            if (current.getNode().id == endNode.id)
             {
+                reconstructPath(start, end);
+                return true;
+            }
+
+            open.RemoveAt(i);
+            closed.Add(current);
+
+            Node neighbor;
+            foreach (Edge e in current.edgeList)
+            {
+                neighbor = e.endNode;
                 // Reset the score & flag for each neighbor
                 tentative_g_score = 0.0f;
                 tentative_is_better = false;
-                
-                // Check if one of the neighbors is the goal location
-                if (currentEdges[j].endNode.getNode().id == endNode.id)
-                {
-                    closed.Add(currentEdges[j].endNode);
-                    open.Clear();
-                    pathList = closed;
-                    return true;
-                }
 
-                // Otherwise, keep searching the neighboring nodes
                 // Skip any node already in the closed list, as this is the path being built
-                if (!closed.Contains(currentEdges[j].endNode))
+                if (!closed.Contains(neighbor))
                 {
-                    // Add any neighboring node not on the open list, and calculate its h, g, & f score, then set its parent (cameFrom) to the current if it doesn't have
-                    // a parent
-                    if (!open.Contains(currentEdges[j].endNode))
+                    tentative_g_score = current.g + Vector3.SqrMagnitude(current.getNode().getNodeBounds().center - 
+                                                neighbor.getNode().getNodeBounds().center);
+
+                    if (!open.Contains(neighbor))
                     {
-                        open.Add(currentEdges[j].endNode);
-                        currentEdges[j].endNode.h = Vector3.SqrMagnitude(currentEdges[j].endNode.getNode().getNodeBounds().center - endNode.getNodeBounds().center);
-                        currentEdges[j].endNode.g = current.g + Vector3.SqrMagnitude(current.getNode().getNodeBounds().center - 
-                                                    currentEdges[j].endNode.getNode().getNodeBounds().center);
-                        currentEdges[j].endNode.f = currentEdges[j].endNode.g + currentEdges[j].endNode.h;
-                        if (currentEdges[j].endNode.cameFrom == null)
-                        {
-                            currentEdges[j].endNode.cameFrom = current;
-                        }
+                        open.Add(neighbor);
+                        tentative_is_better = true;
                     }
-                    else // For any neighbors already in the open list, recalculate the tentative g score to see if it's better than what it already has
+                    else if (tentative_g_score < neighbor.g)
                     {
-                        tentative_g_score = current.g + Vector3.SqrMagnitude(current.getNode().getNodeBounds().center - 
-                                                                             currentEdges[j].endNode.getNode().getNodeBounds().center);
-                        tentative_is_better = tentative_g_score < currentEdges[j].endNode.g;
+                        tentative_is_better = true;
                     }
-                    // If the g score is better, give it that score instead of what it had, updated the f score, and change its parent (cameFrom) to current
+                    // If the g score is better, or for new nodes, update/assign g, h, & f, as well as cameFrom
                     if (tentative_is_better)
                     {
-                        currentEdges[j].endNode.g = tentative_g_score;
-                        currentEdges[j].endNode.f = currentEdges[j].endNode.g + currentEdges[j].endNode.h;
-                        currentEdges[j].endNode.cameFrom = current;
+                        neighbor.g = tentative_g_score;
+                        neighbor.h = Vector3.SqrMagnitude(neighbor.getNode().getNodeBounds().center - endNode.getNodeBounds().center);
+                        neighbor.f = neighbor.g + neighbor.h;
+                        neighbor.cameFrom = current;
                     }          
                 }
             }
         }
         return false;
+    }
+
+    public void reconstructPath(Node start, Node end)
+    {
+        pathList.Clear();
+        pathList.Add(end);
+        Node p = end.cameFrom;
+        while (p != start && p != null)
+        {
+            pathList.Insert(0, p);
+            p = p.cameFrom;
+        }
+        pathList.Insert(0, start);
     }
 
     int lowestF(List<Node> l)
