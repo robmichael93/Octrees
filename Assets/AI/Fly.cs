@@ -55,10 +55,10 @@ public class Fly : MonoBehaviour
             goal = graph.getPathPoint(currentWP).getNodeBounds().center;
             currentNode = graph.getPathPoint(currentWP);
 
-            Vector3 lookAtGoal new Vector3(goal.x, goal.y, goal.z);
+            Vector3 lookAtGoal = new Vector3(goal.x, goal.y, goal.z);
             Vector3 direction = lookAtGoal - this.transform.position;
 
-            Quaternion.Slerp(this.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * rotSpeed);
+            this.transform.rotation = Quaternion.Slerp(this.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime * rotSpeed);
             this.transform.Translate(0, 0, speed * Time.deltaTime);
         }
         else
