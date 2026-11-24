@@ -1,11 +1,11 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Graph
 {
     public List<Edge> edges = new List<Edge>();
     public List<Node> nodes = new List<Node>();
-    List<Node> pathList = new List<Node>();
 
     public Graph()
     {
@@ -47,15 +47,7 @@ public class Graph
         return null;
     }
 
-    public int getPathLength()
-    {
-        return pathList.Count;
-    }
 
-    public OctreeNode getPathPoint(int index)
-    {
-        return pathList[index].octreeNode;
-    }
 
     public void Draw()
     {
@@ -70,11 +62,12 @@ public class Graph
         }
     }
 
-    public bool AStar(OctreeNode startNode, OctreeNode endNode)
+    public bool AStar(OctreeNode startNode, OctreeNode endNode, List<Node> path)
     {
-        pathList.Clear();
+        path.Clear();
         Node start = findNode(startNode.id);
         Node end = findNode(endNode.id);
+
         if (start == null || end == null)
         {
             return false;
@@ -99,7 +92,7 @@ public class Graph
             // Check if the current node is the goal location & if so, create the path, then return true
             if (current.getNode().id == endNode.id)
             {
-                reconstructPath(start, end);
+                reconstructPath(start, end, path);
                 return true;
             }
 
@@ -143,17 +136,17 @@ public class Graph
         return false;
     }
 
-    public void reconstructPath(Node start, Node end)
+    public void reconstructPath(Node start, Node end, List<Node> path)
     {
-        pathList.Clear();
-        pathList.Add(end);
+        path.Clear();
+        path.Add(end);
         Node p = end.cameFrom;
         while (p != start && p != null)
         {
-            pathList.Insert(0, p);
+            path.Insert(0, p);
             p = p.cameFrom;
         }
-        pathList.Insert(0, start);
+        path.Insert(0, start);
     }
 
     int lowestF(List<Node> l)
