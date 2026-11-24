@@ -14,10 +14,9 @@ public class CreateOctree : MonoBehaviour
         ot = new Octree(worldObjects, nodeMinSize, waypoints);
     }
 
-    // Update is called once per frame
-    void Update()
+    public Graph getWaypoints()
     {
-        
+        return waypoints;
     }
 
     void OnDrawGizmos()
