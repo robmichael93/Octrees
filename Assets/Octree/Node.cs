@@ -5,6 +5,8 @@ public class Node
     public List<Edge> edgeList = new List<Edge>();
     public Node path = null;
     public OctreeNode octreeNode;
+    public float f, g, h;
+    public Node cameFrom;
     
     public Node(OctreeNode n)
     {
